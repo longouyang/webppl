@@ -50,12 +50,24 @@ try {
 
 module.exports = function(env) {
 
-
   // Inference interface
 
   env.defaultCoroutine = {
     sample: function(s, k, a, dist) {
-      return k(s, dist.sample());
+      var x = dist.sample();
+      // in strict mode, setting props on numbers, strings, and booleans doesn't work, so coerce them to be their object counterparts
+      var y;
+      if (typeof x == 'number') {
+        y = new Number(x)
+      } else if (typeof x == 'string') {
+        y = new String(x);
+      } else if (typeof x == 'boolean') {
+        y = new Boolean(x);
+      } else {
+        y = x;
+      }
+      y.support = dist.support ? dist.support() : {lower: -Infinity, upper: Infinity};
+      return k(s, y);
     },
     factor: function() {
       throw new Error('factor allowed only inside inference.');
