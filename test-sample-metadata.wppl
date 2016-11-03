@@ -1,0 +1,25 @@
+var k = 5;
+
+var d = Categorical({ps: [0.5, 0.2, 0.3],
+                     vs: ['a', 'b', 'c']});
+
+var i = randomInteger(5);
+
+// NB: categorical() helper is currently written in terms of Discrete, not Categorical
+var i2 = sample(Categorical({ps: [0.5, 0.2, 0.3],
+                             vs: [1, 7, 3]}));
+
+var i3 = sample(Categorical({ps: [0.5, 0.5],
+                             vs: [9, 80]}));
+
+
+var q = sample(Gaussian({mu: 0, sigma: 1}));
+var qb1 = sample(Beta({a: 0.5, b: 2}));
+
+var qb2 = sample(Beta({a: 0.5, b: 2}));
+
+console.log(qb1.support);
+console.log(i2.support);
+var z = qb1 + k;
+
+z.support
