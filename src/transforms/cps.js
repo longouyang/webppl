@@ -363,7 +363,7 @@ function cpsFinalStatement(node, k, fk) {
     })], fail('cpsFinalStatement', node));
 }
 
-// cps-transforms function expressions
+// transforms the top-level function expression of a webppl file
 function cpsMain(node) {
   genvar = makeGenvar();
 
