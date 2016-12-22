@@ -374,9 +374,6 @@ function cpsMain(node) {
   })(node, fail('cps: inProgram', node));
 }
 
-console.log('HERE');
-
-
 module.exports = {
   cps: cpsMain
 };
