@@ -1,5 +1,7 @@
 'use strict';
 
+// Continuation passing style transformation
+
 var assert = require('assert');
 var build = require('./builders');
 var types = require('ast-types').namedTypes;
@@ -32,6 +34,20 @@ function buildContinuationCall(callee, arg) {
   return buildCall(callee, [arg]);
 }
 
+/*
+  transforms:
+
+    function(x, y, z) {
+      <BODY>
+    }
+
+  into:
+
+    function(k, x, y, z) {
+      cpsFinalStatement(<BODY>)
+    }
+
+*/
 function cpsFunction(id, params, body) {
   var k = genvar('k');
   return buildFunction([k].concat(params), cpsFinalStatement(body, k, k), id);
@@ -183,8 +199,10 @@ function atomizeStar(es, metaK) {
   return loop(0);
 }
 
+
 function cps(node, k) {
   switch (node.type) {
+    // essentially transform x into k(x)
     case Syntax.ArrayExpression:
     case Syntax.AssignmentExpression:
     case Syntax.BinaryExpression:
@@ -240,6 +258,8 @@ function cps(node, k) {
 
 function cpsDeclarations(declarations, i, metaK) {
   return clause(Syntax.VariableDeclarator, function(id, init) {
+    // names variable declarations that are functions, e.g.,
+    // var foo = function foo() { .. }
     if (types.FunctionExpression.check(init)) {
       init.id = id;
     }
@@ -304,6 +324,8 @@ function cpsInnerStatement(node, e, fk) {
     })], fail('cpsInnerStatement', node));
 }
 
+// mainly used to make sure that function bodies do something
+// sensible with the last statement (return if an expression, do nothing if not)
 function cpsFinalStatement(node, k, fk) {
   return match(node, [
     clause(Syntax.BlockStatement, function(body) {
@@ -341,6 +363,7 @@ function cpsFinalStatement(node, k, fk) {
     })], fail('cpsFinalStatement', node));
 }
 
+// cps-transforms function expressions
 function cpsMain(node) {
   genvar = makeGenvar();
 
@@ -350,6 +373,9 @@ function cpsMain(node) {
     })(expression, fail('cps: expected FunctionExpression', expression));
   })(node, fail('cps: inProgram', node));
 }
+
+console.log('HERE');
+
 
 module.exports = {
   cps: cpsMain

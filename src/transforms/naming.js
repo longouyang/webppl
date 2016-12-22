@@ -1,5 +1,11 @@
 'use strict';
 
+// This transform adds addresses as arguments to function definitions and calls
+// example for function definitions:
+// var f = function(x,y,z) ==> var f = function(_address<NUM>, x, y, z)
+// example for function calls:
+// f(x,y,z) ==> f(_address0.concat('_address<NUM>', x, y, z)
+
 var _ = require('underscore');
 var Syntax = require('estraverse').Syntax;
 var replace = require('estraverse').replace;

@@ -22,7 +22,7 @@ function fail(message, node) {
 }
 
 // a clause matches a node type and calls a destructor with constituents
-// a clause is a function from a node and failure thunk to a result
+// a destructor is a function from a node and failure thunk to a result
 function clause(type, destructor) {
   return function(node, fail) {
     if (types.hasOwnProperty(type)) {

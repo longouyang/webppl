@@ -34,7 +34,7 @@ function trampoline(node) {
     case Syntax.ExpressionStatement:
       switch (node.expression.type) {
         case Syntax.CallExpression:
-          if (isPrimitive(node.expression.callee)) {
+          if (isPrimitive(node.expression.callee)) { // don't trampoline primitive calls (currently, MemberExpressions, e.g., _.where)
             return node;
           }
           else {
