@@ -13,7 +13,7 @@
     "test": "tests"
   },
   "dependencies": {
-    "adnn": "longouyang/adnn#1177f75",
+    "adnn": "dritchie/adnn",
     "amdefine": "^1.0.0",
     "ast-types": "^0.8.13",
     "colors": "^1.1.2",
