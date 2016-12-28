@@ -2,6 +2,18 @@ var _ = require('underscore');
 var esprima = require('esprima');
 var estraverse = require('estraverse');
 
+/*
+
+   X  ---> Y
+
+   |     /
+   |    /
+   |   /
+   v  /
+     v
+   Z
+
+ */
 function model() {
   var x = gaussian(0, 1);
   var y = gaussian(x, 1);
@@ -10,6 +22,11 @@ function model() {
   return z;
 };
 
+/*
+
+  Z <--- X ---> Y
+
+*/
 function model2() {
   var x = gaussian(0, 1);
   var y = gaussian(x, 1);
@@ -170,8 +187,8 @@ var bayesBall = function(dependencies, query, givens) {
 
 }
 
-console.log(bayesBall(dependencies, 'x', ['z']))
+// console.log(bayesBall(dependencies, 'x', ['z']))
 
 console.log(bayesBall(dependencies2, 'y', ['x']))
 
-console.log(bayesBall(dependencies3, 'f', ['b','e']))
+// console.log(bayesBall(dependencies3, 'f', ['b','e']))
