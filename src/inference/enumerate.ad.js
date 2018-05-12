@@ -21,14 +21,15 @@ module.exports = function(env) {
       throwOnError: true,
       maxRuntimeInMS: Infinity,
       maxEnumTreeSize: Infinity,
-      maxQueueSize: Infinity
+      maxQueueSize: Infinity,
+      verbose: false
     }, 'Enumerate');
 
     global.getCurrentScore = (function() {
       return this.score
     }).bind(this)
 
-
+    this.verbose = options.verbose
     this.throwOnError = options.throwOnError;
     this.maxRuntimeInMS = options.maxRuntimeInMS; // Time upper threshold for enumeration
     this.maxQueueSize = options.maxQueueSize;
@@ -173,6 +174,12 @@ module.exports = function(env) {
     return enumTreeSize;
   }
 
+  // hacky
+  var progressMessage = '';
+  var displayProgress = _.throttle(function() {
+    process.stdout.write('\r' + progressMessage)
+  }, 200, {trailing: false})
+
   Enumerate.prototype.exit = function(s, retval) {
     if (isFinite(this.maxEnumTreeSize)) {
       // under default infer mode, might exit earlier here
@@ -191,10 +198,20 @@ module.exports = function(env) {
     // Increment the completed execution counter
     this.numCompletedExecutions += 1;
 
+
+
+    if (this.verbose) {
+      progressMessage = 'Completed executions: ' + this.numCompletedExecutions + ', queue size is ' + this.queue.size()
+      displayProgress();
+    }
+
     // If anything is left in queue do it:
     if (this.queue.size() > 0 && (this.numCompletedExecutions < this.maxExecutions)) {
       return this.nextInQueue();
     } else {
+      if (this.verbose) {
+        console.log('')
+      }
       if (this.marginal.size === 0) {
         return this.error('All paths explored by Enumerate have probability zero.');
       }
