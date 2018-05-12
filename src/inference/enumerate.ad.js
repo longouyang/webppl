@@ -25,6 +25,10 @@ module.exports = function(env) {
 
     this.throwOnError = options.throwOnError;
     this.maxRuntimeInMS = options.maxRuntimeInMS; // Time upper threshold for enumeration
+    global.getCurrentScore = (function() {
+      return this.score
+    }).bind(this)
+
     this.startTime = Date.now();
     this.firstPath = true; // whether enumeration has reached the first leaf/exit
     this.levelSizes = [];
