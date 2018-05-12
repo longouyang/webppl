@@ -20,15 +20,18 @@ module.exports = function(env) {
       strategy: undefined,
       throwOnError: true,
       maxRuntimeInMS: Infinity,
-      maxEnumTreeSize: Infinity
+      maxEnumTreeSize: Infinity,
+      maxQueueSize: Infinity
     }, 'Enumerate');
 
-    this.throwOnError = options.throwOnError;
-    this.maxRuntimeInMS = options.maxRuntimeInMS; // Time upper threshold for enumeration
     global.getCurrentScore = (function() {
       return this.score
     }).bind(this)
 
+
+    this.throwOnError = options.throwOnError;
+    this.maxRuntimeInMS = options.maxRuntimeInMS; // Time upper threshold for enumeration
+    this.maxQueueSize = options.maxQueueSize;
     this.startTime = Date.now();
     this.firstPath = true; // whether enumeration has reached the first leaf/exit
     this.levelSizes = [];
@@ -119,10 +122,11 @@ module.exports = function(env) {
       }
       // For each value in support, add the continuation paired with
       // support value and score to queue:
-      _.each(support, function(value) {
-        this.enqueueContinuation(
-            k, value, this.score + dist.score(value), store);
-      }.bind(this));
+      if (this.queue.size() <= this.maxQueueSize) {
+        _.each(support, (function(value) {
+          if (this.queue.size() <= this.maxQueueSize) this.enqueueContinuation(k, value, this.score + dist.score(value), store);
+        }).bind(this));
+      }
 
       // Call the next state on the queue
       return this.nextInQueue();
