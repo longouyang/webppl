@@ -26,6 +26,9 @@ module.exports = function(env) {
 
     this.oldStore = s;
 
+    this.startTime = Date.now();
+    this.maxRuntimeInMS = options.maxRuntimeInMS || Infinity
+    this.throwOnError = !!options.throwOnError
     // Setup inference variables
     this.particleIndex = 0;  // marks the active particle
     this.retainedParticle = undefined;
@@ -127,7 +130,22 @@ module.exports = function(env) {
     return newParticles;
   };
 
+  PMCMC.prototype.error = function(errType) {
+    var err = new Error(errType);
+    if (this.throwOnError) {
+      throw err;
+    } else {
+      return this.k(this.oldStore, err);
+    }
+  }
+
+
   PMCMC.prototype.factor = function(s, cc, a, score) {
+    if (Date.now() - this.startTime > this.maxRuntimeInMS) {
+      console.log('timed out')
+      return this.error('PMCMC timeout: max time was set to ' + this.maxRuntimeInMS);
+    }
+
 
     this.updateActiveParticle(score, cc, s);
 
