@@ -26,7 +26,8 @@ module.exports = function(env) {
       saveTraces: false,
       importance: 'default',
       onlyMAP: false,
-      throwOnError: true
+      throwOnError: true,
+      maxRuntimeInMS: Infinity
     }, 'SMC');
 
     if (!_.includes(validImportanceOptVals, options.importance)) {
@@ -34,6 +35,8 @@ module.exports = function(env) {
           'Valid options are: ' + validImportanceOptVals;
       throw new Error(msg);
     }
+    this.maxRuntimeInMS = options.maxRuntimeInMS;
+    this.startTime = Date.now();
     this.throwOnError = options.throwOnError;
 
     this.rejuvKernel = kernels.parseOptions(options.rejuvKernel);
@@ -118,6 +121,10 @@ module.exports = function(env) {
   };
 
   SMC.prototype.factor = function(s, k, a, score) {
+    if (Date.now() - this.startTime > this.maxRuntimeInMS) {
+      console.log('timed out')
+      return this.error('SMC timeout: max time was set to ' + this.maxRuntimeInMS);
+    }
     // Update particle.
     var particle = this.currentParticle();
     particle.trace.numFactors += 1;
